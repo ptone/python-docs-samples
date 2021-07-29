@@ -16,9 +16,11 @@
 # [START run_pubsub_server_setup]
 import base64
 import os
+import time
 
 from flask import Flask, request
 
+sleeptime = int(os.getenv("SLEEP")) if os.getenv("PORT") else 10
 
 app = Flask(__name__)
 # [END run_pubsub_server_setup]
@@ -29,6 +31,7 @@ app = Flask(__name__)
 # [START run_pubsub_handler]
 @app.route("/", methods=["POST"])
 def index():
+    global sleeptime
     envelope = request.get_json()
     if not envelope:
         msg = "no Pub/Sub message received"
@@ -46,7 +49,9 @@ def index():
     if isinstance(pubsub_message, dict) and "data" in pubsub_message:
         name = base64.b64decode(pubsub_message["data"]).decode("utf-8").strip()
 
+    time.sleep(sleeptime)
     print(f"Hello {name}!")
+
 
     return ("", 204)
 
